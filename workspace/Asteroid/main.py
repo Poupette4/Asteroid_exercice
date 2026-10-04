@@ -1,3 +1,5 @@
+from this import s
+
 import pygame
 import sys
 from constants import *
@@ -5,6 +7,8 @@ from logger import log_state,log_event
 from asteroid import Asteroid
 from player import Player
 from asteroidfield import AsteroidField
+from shot import Shot
+
 
 def main():
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
@@ -20,10 +24,12 @@ def main():
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
+    shots = pygame.sprite.Group()
 
     Player.containers = (updatable,drawable)
     Asteroid.containers = (updatable,drawable,asteroids)
     AsteroidField.containers = (updatable)
+    Shot.containers = (updatable,drawable,shots)
 
     asteroid_field = AsteroidField()
     ship = Player(SCREEN_WIDTH/2,SCREEN_HEIGHT/2)
@@ -43,6 +49,11 @@ def main():
                 log_event("player_hit")
                 print("Game over!")
                 sys.exit()
+            for shot in shots:
+                if asteroid.collides_with(shot):
+                    log_event("asteroid_shot")
+                    asteroid.split()
+                    shot.kill()
 
         screen.fill("black")
         for object in drawable:
